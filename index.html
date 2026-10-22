@@ -300,24 +300,55 @@ function stopCamera(){
  ctx.clearRect(0,0,canvas.width,canvas.height);
 }
 async function startCamera(){
- if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){setCameraStatus('Browser tidak mendukung kamera','bad');$('cameraPlaceholder').innerHTML='<b>Kamera tidak tersedia</b>Gunakan browser modern melalui HTTPS atau localhost.';return;}
- $('cameraBtn').disabled=true;setCameraStatus('Meminta izin kamera…');
+ const placeholder=$('cameraPlaceholder');
+ if(!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+  setCameraStatus('Kamera perlu HTTPS','bad');
+  placeholder.classList.remove('hidden');
+  placeholder.innerHTML='<b>🔒 Kamera diblokir browser</b>File HTML yang dibuka dari Downloads/file:// sering tidak diizinkan memakai kamera. Buka game melalui HTTPS (misalnya GitHub Pages) atau localhost. Tombol jawaban tetap bisa dipakai tanpa kamera.';
+  return;
+ }
+ $('cameraBtn').disabled=true;
+ setCameraStatus('Meminta izin kamera…');
  try{
-  cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:640},height:{ideal:480}},audio:false});
-  video.srcObject=cameraStream;await video.play();$('cameraPlaceholder').classList.add('hidden');
+  // Coba kamera depan terlebih dahulu, lalu ulangi dengan batasan paling sederhana
+  // jika perangkat/browser tidak mendukung constraint kamera depan.
+  try{
+   cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'user'},width:{ideal:640},height:{ideal:480}},audio:false});
+  }catch(firstError){
+   if(firstError.name==='NotAllowedError'||firstError.name==='PermissionDeniedError'||firstError.name==='NotFoundError') throw firstError;
+   cameraStream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});
+  }
+  video.srcObject=cameraStream;
+  video.muted=true;
+  video.setAttribute('playsinline','');
+  await video.play();
+  placeholder.classList.add('hidden');
   canvas.width=video.videoWidth||640;canvas.height=video.videoHeight||480;
-  if(!window.Hands){throw new Error('Library MediaPipe tidak berhasil dimuat. Periksa koneksi internet lalu muat ulang halaman.');}
+  if(!window.Hands){throw new Error('Komponen deteksi gestur belum termuat. Pastikan internet aktif, lalu muat ulang game.');}
   if(!hands){
    hands=new Hands({locateFile:(file)=>'https://cdn.jsdelivr.net/npm/@mediapipe/hands/'+file});
    hands.setOptions({maxNumHands:1,modelComplexity:1,minDetectionConfidence:0.6,minTrackingConfidence:0.55});
    hands.onResults(onResults);
   }
-  cameraRunning=true;setCameraStatus('Kamera aktif — arahkan tangan ke kamera','ok');$('gestureText').textContent='Menunggu tangan…';
-  const token=++cameraLoopToken;cameraBtnLoop(token);
+  cameraRunning=true;
+  setCameraStatus('Kamera aktif — arahkan tangan ke kamera','ok');
+  $('gestureText').textContent='Menunggu tangan…';
+  const token=++cameraLoopToken;
+  cameraBtnLoop(token);
  }catch(err){
-  console.error(err);setCameraStatus(err.name==='NotAllowedError'?'Izin kamera ditolak':'Kamera gagal aktif','bad');
-  $('cameraPlaceholder').classList.remove('hidden');$('cameraPlaceholder').innerHTML='<b>⚠️ Kamera belum aktif</b>'+escapeHtml(err.message||'Periksa izin kamera dan gunakan HTTPS atau localhost.');
+  console.error('Gagal mengaktifkan kamera:',err);
   if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;}
+  video.srcObject=null;
+  cameraRunning=false;
+  let message='Terjadi kesalahan saat mengaktifkan kamera.';
+  if(err.name==='NotAllowedError'||err.name==='PermissionDeniedError') message='Izin kamera ditolak. Klik ikon gembok/kamera di bilah alamat browser, izinkan Kamera, lalu muat ulang halaman.';
+  else if(err.name==='NotFoundError'||err.name==='DevicesNotFoundError') message='Kamera tidak ditemukan. Pastikan perangkat memiliki kamera dan tidak sedang dipakai aplikasi lain.';
+  else if(err.name==='NotReadableError'||err.name==='TrackStartError') message='Kamera sedang dipakai aplikasi lain. Tutup aplikasi kamera/video lain lalu coba lagi.';
+  else if(err.name==='OverconstrainedError') message='Pengaturan kamera tidak cocok dengan perangkat. Coba kamera default perangkat.';
+  else if(err.message) message=err.message;
+  setCameraStatus('Kamera gagal aktif','bad');
+  placeholder.classList.remove('hidden');
+  placeholder.innerHTML='<b>⚠️ Kamera belum aktif</b>'+escapeHtml(message)+'<br><small>Game tetap bisa dimainkan dengan tombol pilihan jawaban.</small>';
  }finally{$('cameraBtn').disabled=false;}
 }
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
