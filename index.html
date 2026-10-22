@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Petualangan Gestur - Informatika Kelas X</title>
+<style>
+:root{--navy:#14213d;--blue:#2563eb;--cyan:#67e8f9;--yellow:#facc15;--green:#22c55e;--red:#ef4444;--panel:#ffffffee}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(140deg,#0f172a,#1d4ed8 55%,#7c3aed);color:#fff;min-height:100vh}
+button,input{font:inherit}button{cursor:pointer;border:0;border-radius:13px;padding:11px 15px;font-weight:800;transition:transform .15s,filter .15s}button:hover{filter:brightness(1.06);transform:translateY(-1px)}button:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.wrap{max-width:1200px;margin:auto;padding:18px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.brand{font-size:clamp(1.2rem,3vw,2rem);font-weight:950;letter-spacing:.02em}.brand span{color:var(--yellow)}.pill{background:#ffffff20;border:1px solid #ffffff35;border-radius:999px;padding:7px 12px;font-size:.9rem}
+.layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:16px;margin-top:16px}.panel{background:var(--panel);color:var(--navy);border-radius:22px;padding:18px;box-shadow:0 15px 35px #02061740}.hero{text-align:center;padding:28px 18px}.hero .emoji{font-size:4rem}.hero h1{font-size:clamp(1.8rem,5vw,3.4rem);margin:8px 0}.hero p{max-width:700px;margin:0 auto 18px;line-height:1.6}.actions{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}.primary{background:var(--yellow);color:#172554}.secondary{background:#dbeafe;color:#1e3a8a}.danger{background:#fee2e2;color:#991b1b}.green{background:#bbf7d0;color:#14532d}.field{display:flex;flex-direction:column;gap:6px;max-width:350px;margin:14px auto;text-align:left}.field input{padding:12px;border:2px solid #cbd5e1;border-radius:12px;color:#0f172a}.hidden{display:none!important}
+.cameraBox{position:relative;background:#0f172a;border-radius:17px;overflow:hidden;aspect-ratio:4/3;display:grid;place-items:center;color:#cbd5e1}.cameraBox video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);display:block}.cameraBox canvas{position:absolute;inset:0;width:100%;height:100%;transform:scaleX(-1);pointer-events:none}.cameraPlaceholder{position:absolute;text-align:center;padding:18px;max-width:300px}.cameraPlaceholder b{display:block;font-size:1.15rem;margin-bottom:6px}.cameraStatus{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:10px;font-size:.88rem}.status{font-weight:800}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#f59e0b;margin-right:5px}.dot.ok{background:#22c55e}.dot.bad{background:#ef4444}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.stat{background:#eff6ff;border-radius:13px;padding:10px;text-align:center}.stat small{display:block;color:#64748b;font-weight:700}.stat strong{font-size:1.3rem}.progress{height:10px;background:#dbeafe;border-radius:99px;overflow:hidden}.progress div{height:100%;width:0;background:linear-gradient(90deg,#22c55e,#67e8f9);transition:width .25s}
+.gameArea{min-height:330px;display:flex;flex-direction:column;gap:13px}.scene{border-radius:17px;background:linear-gradient(135deg,#dbeafe,#ede9fe);padding:15px;position:relative;overflow:hidden}.sceneTitle{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-weight:900}.path{height:94px;margin:13px 0 5px;border-radius:14px;background:linear-gradient(#bae6fd 0 45%,#86efac 45% 100%);position:relative;overflow:hidden}.path:after{content:"";position:absolute;bottom:13px;left:0;right:0;height:3px;background:#a16207;opacity:.45}.player{position:absolute;bottom:21px;left:10%;font-size:2rem;transition:left .35s;filter:drop-shadow(0 3px 1px #0002)}.goal{position:absolute;right:7%;bottom:18px;font-size:2rem}.obstacle{position:absolute;left:48%;bottom:19px;font-size:1.8rem}.question{font-size:1.1rem;font-weight:900;line-height:1.45}.choices{display:grid;grid-template-columns:1fr 1fr;gap:9px}.choice{background:#f1f5f9;color:#0f172a;text-align:left;border:2px solid #cbd5e1;min-height:52px}.choice.selected{border-color:#2563eb;background:#dbeafe;box-shadow:0 0 0 3px #2563eb22}.choice.correct{background:#dcfce7;border-color:#16a34a}.choice.wrong{background:#fee2e2;border-color:#dc2626}.hint{background:#fef9c3;color:#713f12;border-radius:12px;padding:10px;font-size:.9rem;line-height:1.45}.controlRow{display:flex;gap:8px;flex-wrap:wrap}.controlRow button{flex:1;min-width:120px}.gestureLegend{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.gestureLegend div{background:#f8fafc;border-radius:12px;padding:9px;text-align:center;font-size:.82rem}.gestureLegend b{display:block;font-size:1.35rem}.feedback{min-height:28px;font-weight:800}.foot{opacity:.85;text-align:center;font-size:.82rem;padding:16px 0}.modal{position:fixed;inset:0;background:#020617b8;display:grid;place-items:center;padding:18px;z-index:5}.modalCard{background:#fff;color:#14213d;border-radius:22px;padding:24px;max-width:520px;width:100%;text-align:center}.modalCard h2{margin-top:0}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.wrap{padding:12px}.panel{padding:14px}.gameArea{min-height:0}.hero{padding:22px 12px}.gestureLegend{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:420px){.choices{grid-template-columns:1fr}.stats{gap:5px}.stat{padding:8px 4px}.stat strong{font-size:1.1rem}.gestureLegend div{padding:7px 3px;font-size:.74rem}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">🧭 PETUALANGAN <span>GESTUR</span></div>
+    <div class="pill">INFORMATIKA • KELAS X</div>
+  </header>
+
+  <section id="startScreen" class="panel hero" style="margin-top:16px">
+    <div class="emoji">🖐️ 🗺️ ✨</div>
+    <h1>Jelajah Dunia Digital!</h1>
+    <p>Gunakan tangan asli di depan kamera untuk memilih jawaban dan menggerakkan petualang. Jawab tantangan Informatika, lewati rintangan algoritma, dan capai gerbang pengetahuan!</p>
+    <label class="field">Nama petualang
+      <input id="playerName" maxlength="24" placeholder="Masukkan nama kamu" value="Petualang">
+    </label>
+    <label class="field">Pilih paket soal
+      <select id="questionPack" style="padding:12px;border:2px solid #cbd5e1;border-radius:12px;color:#0f172a;background:white">
+        <option value="informatics">Informatika Kelas X</option>
+        <option value="general">Pengetahuan Umum</option>
+        <option value="waste">Klasifikasi dan Pengelolaan Limbah</option>
+        <option value="mixed" selected>Campuran: Informatika + Pengetahuan Umum + Limbah</option>
+      </select>
+    </label>
+    <label class="field">Pilih jenis permainan
+      <select id="gameMode" style="padding:12px;border:2px solid #cbd5e1;border-radius:12px;color:#0f172a;background:white">
+        <option value="adventure" selected>🗺️ Petualangan — semua soal paket</option>
+        <option value="quick">⚡ Kuis Cepat — 10 soal acak</option>
+        <option value="marathon">🏆 Maraton — semua soal, 5 nyawa</option>
+      </select>
+    </label>
+    <div class="actions">
+      <button id="startBtn" class="primary">🚀 MULAI PETUALANGAN</button>
+      <button id="helpBtn" class="secondary">📘 PETUNJUK</button>
+      <button id="soundToggleStart" class="green">🔊 SUARA: ON</button>
+    </div>
+    <p style="font-size:.85rem;margin-top:14px">Kamera hanya digunakan untuk mendeteksi gestur di browser. Video tidak direkam atau diunggah oleh game ini.</p>
+  </section>
+
+  <section id="gameScreen" class="hidden">
+    <div class="stats">
+      <div class="stat"><small>SKOR</small><strong id="score">0</strong></div>
+      <div class="stat"><small>NYAWA</small><strong id="lives">❤️❤️❤️</strong></div>
+      <div class="stat"><small>POSISI</small><strong id="round">1/34</strong></div>
+    </div>
+    <div class="progress"><div id="progressBar"></div></div>
+    <div class="layout">
+      <div class="panel">
+        <h2 style="margin-top:0">📷 Kamera Gestur</h2>
+        <div class="cameraBox">
+          <video id="video" playsinline muted></video>
+          <canvas id="overlay"></canvas>
+          <div id="cameraPlaceholder" class="cameraPlaceholder"><b>📷 Kamera belum aktif</b>Tekan “Aktifkan Kamera”, lalu izinkan akses kamera pada browser.</div>
+        </div>
+        <div class="cameraStatus">
+          <span><i id="cameraDot" class="dot"></i><span id="cameraStatusText" class="status">Kamera belum aktif</span></span>
+          <span>Gestur: <b id="gestureText">Belum terdeteksi</b></span>
+        </div>
+        <div class="controlRow" style="margin-top:12px">
+          <button id="cameraBtn" class="green">📷 Aktifkan Kamera</button>
+          <button id="stopCameraBtn" class="danger">Matikan Kamera</button>
+          <button id="soundToggleGame" class="secondary">🔊 Suara ON</button>
+        </div>
+        <div class="hint" style="margin-top:12px"><b>Cara kontrol:</b> ☝️ telunjuk = A, ✌️ dua jari = B, 🤟 tiga jari = C, 🖐️ lima jari = D. Tahan gestur sekitar 1 detik untuk memilih, lalu ✊ kepalkan tangan untuk konfirmasi. Tombol di bawah tetap bisa digunakan.</div>
+        <h3>Petunjuk gestur</h3>
+        <div class="gestureLegend">
+          <div><b>☝️</b>Pilih A</div><div><b>✌️</b>Pilih B</div><div><b>🤟</b>Pilih C</div>
+          <div><b>🖐️</b>Pilih D</div><div><b>✊</b>Konfirmasi</div><div><b>👌</b>Soal berikutnya</div>
+        </div>
+      </div>
+      <div class="panel gameArea">
+        <div class="scene">
+          <div class="sceneTitle"><span id="sceneLabel">HUTAN ALGORITMA</span><span id="checkpoint">Gerbang 1</span></div>
+          <div class="path"><span id="playerAvatar" class="player">🧑‍🚀</span><span class="obstacle">🪨</span><span class="goal">🏰</span></div>
+          <div style="font-size:.88rem;color:#334155">Misi: pecahkan soal untuk maju menuju gerbang berikutnya.</div>
+        </div>
+        <div id="questionText" class="question">Pertanyaan akan muncul di sini.</div>
+        <div id="choices" class="choices"></div>
+        <div class="controlRow">
+          <button id="confirmBtn" class="primary">✊ KONFIRMASI</button>
+          <button id="nextBtn" class="secondary" disabled>👌 SOAL BERIKUTNYA</button>
+        </div>
+        <div id="feedback" class="feedback" aria-live="polite">Aktifkan kamera atau gunakan tombol pilihan.</div>
+        <div class="hint" id="explanation">Pilih jawaban yang menurutmu benar.</div>
+        <div class="controlRow">
+          <button id="restartBtn" class="secondary">🔄 Ulangi</button>
+          <button id="exitBtn" class="danger">🏁 Akhiri</button>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="foot">Media pembelajaran interaktif • HTML + JavaScript + MediaPipe Hands</div>
+</div>
+
+<div id="helpModal" class="modal hidden">
+  <div class="modalCard">
+    <h2>📘 Petunjuk Petualangan</h2>
+    <p>1. Mulai game dan tekan <b>Aktifkan Kamera</b>.<br>2. Izinkan akses kamera.<br>3. Tunjukkan satu tangan dengan jelas, telapak menghadap kamera.<br>4. Tahan gestur pilihan sekitar satu detik. Kepalkan tangan untuk mengunci jawaban.<br>5. Setelah jawaban dinilai, buat gestur 👌 untuk lanjut ke soal berikutnya. Jika gestur tidak terbaca, gunakan tombol di layar.</p>
+    <p><b>Catatan:</b> kamera umumnya memerlukan HTTPS atau localhost. MediaPipe dimuat dari internet, jadi koneksi internet diperlukan.</p>
+    <button id="closeHelpBtn" class="primary">Mengerti!</button>
+  </div>
+</div>
+<div id="endModal" class="modal hidden">
+  <div class="modalCard">
+    <div style="font-size:3rem">🏆</div><h2 id="endTitle">Petualangan Selesai!</h2>
+    <p id="endSummary"></p>
+    <button id="playAgainBtn" class="primary">Main Lagi</button>
+    <button id="backMenuBtn" class="secondary">Kembali ke Menu</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+<script>
+(() => {
+'use strict';
+const QUESTIONS = [
+ {q:"Dalam berpikir komputasional, memecah masalah besar menjadi bagian kecil disebut ...",a:["Abstraksi","Dekomposisi","Evaluasi","Enkripsi"],c:1,e:"Dekomposisi membagi masalah kompleks menjadi bagian yang lebih mudah ditangani."},
+ {q:"Urutan langkah logis untuk menyelesaikan masalah disebut ...",a:["Algoritma","Perangkat keras","Jaringan","Variabel"],c:0,e:"Algoritma adalah langkah-langkah terurut untuk menyelesaikan suatu masalah."},
+ {q:"Menemukan kesamaan pada beberapa masalah merupakan proses ...",a:["Debugging","Enkripsi","Pengenalan pola","Instalasi"],c:2,e:"Pengenalan pola membantu menemukan kemiripan agar solusi dapat digunakan kembali."},
+ {q:"Memusatkan perhatian pada informasi penting dan mengabaikan detail yang tidak relevan disebut ...",a:["Dekomposisi","Abstraksi","Perulangan","Percabangan"],c:1,e:"Abstraksi menyederhanakan masalah dengan mengambil informasi yang penting."},
+ {q:"Simbol belah ketupat pada diagram alir biasanya berarti ...",a:["Mulai/selesai","Input/output","Proses","Keputusan"],c:3,e:"Simbol belah ketupat menunjukkan kondisi atau keputusan, misalnya Ya/Tidak."},
+ {q:"Struktur algoritma yang menjalankan langkah secara berurutan adalah ...",a:["Sekuensial","Percabangan","Perulangan","Pengacakan"],c:0,e:"Sekuensial menjalankan instruksi satu demi satu sesuai urutan."},
+ {q:"Jika program memilih aksi berdasarkan kondisi benar atau salah, digunakan ...",a:["Perulangan","Percabangan","Komentar","Folder"],c:1,e:"Percabangan seperti IF–ELSE memilih aksi berdasarkan kondisi."},
+ {q:"Proses mencari dan memperbaiki kesalahan pada program disebut ...",a:["Browsing","Formatting","Debugging","Streaming"],c:2,e:"Debugging adalah proses menemukan dan memperbaiki bug atau kesalahan program."},
+ {q:"Manakah contoh data terstruktur?",a:["Kumpulan foto acak","Tabel nilai dengan kolom nama dan nilai","Rekaman suara bebas","Video tanpa label"],c:1,e:"Tabel dengan kolom yang jelas menyusun data dalam format terstruktur."},
+ {q:"Dalam berpikir komputasional, mengapa solusi perlu diuji?",a:["Agar warna berubah","Untuk memastikan solusi berjalan dan menemukan kesalahan","Agar kode makin panjang","Supaya komputer mati"],c:1,e:"Pengujian memeriksa apakah solusi menghasilkan keluaran yang diharapkan."},
+ {q:"Perangkat fisik komputer seperti keyboard dan monitor disebut ...",a:["Software","Hardware","Brainware","Malware"],c:1,e:"Hardware adalah komponen fisik komputer yang dapat dilihat dan disentuh."},
+ {q:"Program atau aplikasi yang menjalankan tugas pada komputer disebut ...",a:["Hardware","Software","Prosesor","Kabel"],c:1,e:"Software adalah perangkat lunak berupa program atau aplikasi."},
+ {q:"Orang yang menggunakan atau mengelola sistem komputer disebut ...",a:["Brainware","Firmware","Hardware","Shareware"],c:0,e:"Brainware adalah manusia yang menggunakan atau mengelola sistem komputer."},
+ {q:"Satuan informasi terkecil dalam komputasi digital adalah ...",a:["Byte","Bit","Kilobyte","Megabyte"],c:1,e:"Bit adalah satuan data terkecil yang bernilai 0 atau 1."},
+ {q:"Delapan bit setara dengan ...",a:["1 byte","1 kilobyte","1 megabyte","1 gigabyte"],c:0,e:"Satu byte terdiri dari delapan bit."},
+ {q:"Kumpulan komputer yang saling terhubung untuk berbagi data disebut ...",a:["Jaringan komputer","Pengolah kata","Spreadsheet","Basis data lokal"],c:0,e:"Jaringan komputer menghubungkan perangkat agar dapat bertukar data dan sumber daya."},
+ {q:"Manakah contoh kata sandi yang lebih aman?",a:["123456","password","Nama sendiri","Gabungan unik huruf, angka, dan simbol"],c:3,e:"Kata sandi yang panjang dan unik dengan kombinasi karakter lebih sulit ditebak."},
+ {q:"Pesan atau tautan palsu yang bertujuan mencuri informasi disebut ...",a:["Phishing","Browsing","Coding","Backup"],c:0,e:"Phishing menipu pengguna agar memberikan data pribadi atau kredensial."},
+ {q:"Tindakan yang tepat saat menerima berita meragukan adalah ...",a:["Langsung menyebarkan","Memeriksa sumber dan membandingkan informasi","Mengubah judulnya","Menghapus nama penulis"],c:1,e:"Periksa sumber tepercaya dan bandingkan dengan informasi lain sebelum membagikan berita."},
+ {q:"Data pribadi yang sebaiknya tidak dibagikan sembarangan adalah ...",a:["Warna favorit","Nomor kata sandi dan kode OTP","Judul buku umum","Nama pelajaran"],c:1,e:"Kata sandi dan kode OTP bersifat rahasia dan tidak boleh diberikan kepada orang lain."},
+ {q:"Aplikasi lembar kerja yang biasa digunakan untuk mengolah tabel dan angka disebut ...",a:["Spreadsheet","Browser","Pemutar video","Editor gambar"],c:0,e:"Spreadsheet digunakan untuk mengolah data berbentuk tabel, melakukan perhitungan, dan membuat grafik."},
+ {q:"Dalam pemrograman, variabel digunakan untuk ...",a:["Menyimpan nilai atau data","Mendinginkan komputer","Menghapus sistem operasi","Menghubungkan kabel listrik"],c:0,e:"Variabel adalah tempat bernama untuk menyimpan nilai yang dapat digunakan program."},
+ {q:"Perintah perulangan berguna untuk ...",a:["Mengulang instruksi sesuai kondisi","Mematikan monitor","Menghapus semua data otomatis","Mengganti perangkat keras"],c:0,e:"Perulangan menjalankan instruksi berulang kali selama kondisi atau jumlah tertentu terpenuhi."},
+ {q:"Pada kode, kondisi IF biasanya digunakan untuk ...",a:["Membuat keputusan berdasarkan syarat","Menyimpan gambar","Mengatur volume speaker","Menghapus keyboard"],c:0,e:"IF memeriksa kondisi dan menjalankan instruksi jika kondisi terpenuhi."},
+ {q:"Representasi visual langkah-langkah algoritma menggunakan simbol disebut ...",a:["Flowchart","Wallpaper","Browser","Password"],c:0,e:"Flowchart atau diagram alir menggambarkan alur proses dengan simbol standar."},
+ {q:"Contoh keluaran (output) komputer adalah ...",a:["Menekan tombol keyboard","Data yang dimasukkan","Hasil yang tampil di monitor","Gerakan mouse"],c:2,e:"Output adalah informasi hasil pemrosesan, misalnya teks atau gambar di monitor."},
+ {q:"Mengapa pencadangan (backup) data penting?",a:["Agar file selalu lebih besar","Untuk memulihkan data jika data utama hilang atau rusak","Agar internet lebih cepat","Supaya layar lebih terang"],c:1,e:"Backup menyediakan salinan data untuk pemulihan ketika data utama bermasalah."},
+ {q:"Tempat penyimpanan data yang terorganisasi agar mudah dicari dan dikelola disebut ...",a:["Basis data","Desktop wallpaper","Kabel data","Sistem pendingin"],c:0,e:"Basis data menyimpan data terorganisasi agar dapat diakses dan dikelola dengan efisien."},
+ {q:"Ketika bekerja dalam kelompok membuat solusi digital, hal penting yang perlu dilakukan adalah ...",a:["Menyimpan semua ide sendiri","Berbagi tugas dan berkomunikasi dengan jelas","Mengabaikan masukan","Menghapus pekerjaan teman"],c:1,e:"Kolaborasi yang baik membutuhkan pembagian tugas, komunikasi, dan saling menghargai."},
+ {q:"Sikap yang tepat saat menggunakan karya digital milik orang lain adalah ...",a:["Mengaku sebagai pembuat","Menghapus nama pencipta","Menghargai hak cipta dan mencantumkan sumber","Menyebarkan tanpa memeriksa izin"],c:2,e:"Etika digital mencakup menghormati hak cipta dan mencantumkan sumber sesuai ketentuan."},
+ {q:"Informasi yang dimasukkan ke dalam sistem untuk diproses disebut ...",a:["Input","Output","Bug","Animasi"],c:0,e:"Input adalah data atau instruksi yang dimasukkan ke dalam sistem."},
+ {q:"Manakah urutan umum proses komputasi yang benar?",a:["Output–input–proses","Input–proses–output","Proses–output–input","Input–output–proses"],c:1,e:"Model umum komputasi adalah menerima input, memprosesnya, lalu menghasilkan output."},
+ {q:"Jika hasil program tidak sesuai harapan, langkah awal yang baik adalah ...",a:["Memeriksa langkah dan data yang digunakan","Langsung membuang komputer","Mengabaikan masalah","Mengganti semua perangkat"],c:0,e:"Periksa kembali input, algoritma, dan bagian kode secara sistematis untuk menemukan sumber masalah."},
+ {q:"Manakah contoh penggunaan teknologi yang bertanggung jawab?",a:["Menyebarkan foto teman tanpa izin","Menggunakan sumber tepercaya dan menjaga privasi","Membagikan kode OTP","Mengunduh file mencurigakan"],c:1,e:"Penggunaan teknologi yang bertanggung jawab menjaga privasi, keamanan, dan keakuratan informasi."}
+];
+const GENERAL_QUESTIONS = [
+ {q:"Apa nama planet tempat manusia tinggal?",a:["Mars","Bumi","Venus","Jupiter"],c:1,e:"Bumi adalah planet tempat manusia hidup."},
+ {q:"Berapa hasil 12 × 8?",a:["86","92","96","108"],c:2,e:"12 dikali 8 sama dengan 96."},
+ {q:"Apa ibu kota Indonesia saat ini dalam konteks pemerintahan yang masih bertransisi?",a:["Bandung","Surabaya","Jakarta","Medan"],c:2,e:"Jakarta masih menjadi pusat pemerintahan selama proses transisi pemindahan ibu kota berlangsung."},
+ {q:"Organ tubuh yang memompa darah adalah ...",a:["Paru-paru","Jantung","Lambung","Ginjal"],c:1,e:"Jantung memompa darah ke seluruh tubuh."},
+ {q:"Sumber energi utama bagi Bumi adalah ...",a:["Bulan","Matahari","Angin","Batu bara"],c:1,e:"Matahari menyediakan sebagian besar energi yang mendukung kehidupan di Bumi."},
+ {q:"Bahasa resmi negara Indonesia adalah ...",a:["Bahasa Jawa","Bahasa Melayu","Bahasa Indonesia","Bahasa Sunda"],c:2,e:"Bahasa Indonesia adalah bahasa nasional dan bahasa resmi negara."},
+ {q:"Sila ketiga Pancasila berbunyi ...",a:["Ketuhanan Yang Maha Esa","Kemanusiaan yang adil dan beradab","Persatuan Indonesia","Keadilan sosial bagi seluruh rakyat Indonesia"],c:2,e:"Sila ketiga Pancasila adalah Persatuan Indonesia."},
+ {q:"Hewan yang mengalami metamorfosis sempurna adalah ...",a:["Kucing","Ayam","Kupu-kupu","Kambing"],c:2,e:"Kupu-kupu melalui tahap telur, larva, pupa, dan dewasa."},
+ {q:"Alat untuk mengukur suhu adalah ...",a:["Barometer","Termometer","Anemometer","Speedometer"],c:1,e:"Termometer digunakan untuk mengukur suhu."},
+ {q:"Benua terbesar di dunia adalah ...",a:["Afrika","Eropa","Asia","Australia"],c:2,e:"Asia merupakan benua terbesar berdasarkan luas wilayah."},
+ {q:"Apa makna semboyan Bhinneka Tunggal Ika?",a:["Bersatu kita teguh","Berbeda-beda tetapi tetap satu","Rajin pangkal pandai","Hemat pangkal kaya"],c:1,e:"Semboyan ini menekankan persatuan di tengah keberagaman."},
+ {q:"Air membeku pada suhu berapa pada tekanan normal?",a:["0°C","10°C","50°C","100°C"],c:0,e:"Air murni membeku pada sekitar 0°C pada tekanan normal."},
+ {q:"Kegiatan menanam kembali hutan yang gundul disebut ...",a:["Urbanisasi","Reboisasi","Industrialisasi","Imigrasi"],c:1,e:"Reboisasi adalah penanaman kembali pohon di kawasan hutan."},
+ {q:"Lambang kimia untuk oksigen adalah ...",a:["Ox","O","Og","Ok"],c:1,e:"Lambang unsur oksigen adalah O."},
+ {q:"Dalam satu jam terdapat ... menit.",a:["30","45","60","100"],c:2,e:"Satu jam terdiri dari 60 menit."},
+ {q:"Peta digunakan terutama untuk ...",a:["Memasak makanan","Menggambarkan lokasi dan wilayah","Mengukur berat badan","Menyimpan suara"],c:1,e:"Peta menggambarkan permukaan atau bagian wilayah secara simbolis."},
+ {q:"Olahraga yang menggunakan raket dan kok adalah ...",a:["Sepak bola","Bulu tangkis","Renang","Bola basket"],c:1,e:"Bulu tangkis dimainkan menggunakan raket dan kok."},
+ {q:"Proses tumbuhan membuat makanan dengan bantuan cahaya disebut ...",a:["Fotosintesis","Evaporasi","Kondensasi","Fermentasi"],c:0,e:"Fotosintesis menggunakan energi cahaya untuk membuat makanan."},
+ {q:"Salah satu contoh sumber daya alam yang dapat diperbarui adalah ...",a:["Minyak bumi","Batu bara","Sinar matahari","Gas alam"],c:2,e:"Sinar matahari tersedia secara berkelanjutan dalam skala kehidupan manusia."},
+ {q:"Jika menemukan berita mengejutkan di internet, tindakan terbaik adalah ...",a:["Langsung membagikan","Memeriksa sumber dan kebenarannya","Mengubah judulnya","Mengirim ke semua grup"],c:1,e:"Informasi perlu diverifikasi sebelum dibagikan."}
+];
+const WASTE_QUESTIONS = [
+ {q:"Sisa sayuran dan kulit buah termasuk jenis limbah ...",a:["Organik","Anorganik","B3","Elektronik"],c:0,e:"Sisa bahan pangan mudah terurai sehingga termasuk limbah organik."},
+ {q:"Contoh limbah anorganik yang dapat didaur ulang adalah ...",a:["Kulit pisang","Daun kering","Botol plastik","Sisa nasi"],c:2,e:"Botol plastik dapat dipilah dan didaur ulang melalui jalur yang sesuai."},
+ {q:"Kepanjangan 3R dalam pengelolaan sampah adalah ...",a:["Reduce, Reuse, Recycle","Read, Run, Rest","Remove, Return, Repair","Reuse, Repair, Replace"],c:0,e:"3R berarti mengurangi, menggunakan kembali, dan mendaur ulang."},
+ {q:"Tindakan Reduce berarti ...",a:["Membakar sampah","Mengurangi penggunaan barang yang menghasilkan sampah","Membuang semua sampah ke sungai","Mencampur sampah"],c:1,e:"Reduce berfokus mengurangi sampah sejak dari sumbernya."},
+ {q:"Contoh tindakan Reuse adalah ...",a:["Memakai kembali stoples sebagai wadah","Membeli kantong sekali pakai","Membakar kertas","Membuang botol ke sungai"],c:0,e:"Reuse berarti menggunakan kembali barang yang masih layak."},
+ {q:"Sampah daun dan sisa sayur dapat diolah menjadi ...",a:["Kompos","Bensin","Kaca","Logam"],c:0,e:"Limbah organik dapat dikomposkan dengan pengolahan yang tepat."},
+ {q:"Baterai bekas sebaiknya ...",a:["Dicampur dengan sisa makanan","Dibuang ke sungai","Dipisahkan dan diserahkan ke pengelola khusus","Dibakar di halaman"],c:2,e:"Baterai dapat mengandung bahan berbahaya sehingga perlu penanganan khusus."},
+ {q:"Limbah B3 adalah limbah yang ...",a:["Selalu bisa dimakan","Mengandung bahan berbahaya dan/atau beracun","Hanya berasal dari daun","Pasti mudah terurai"],c:1,e:"B3 berarti bahan berbahaya dan beracun; limbahnya perlu dikelola dengan aman."},
+ {q:"Mengapa sampah tidak boleh dibuang ke sungai?",a:["Agar sungai menjadi dangkal","Dapat menyumbat aliran dan mencemari air","Agar ikan pindah","Supaya air berubah warna"],c:1,e:"Sampah di sungai dapat menyebabkan pencemaran, sumbatan, dan banjir."},
+ {q:"Tempat yang tepat untuk sisa makanan yang akan dikomposkan adalah ...",a:["Wadah sampah organik","Wadah limbah elektronik","Saluran air","Tempat limbah medis"],c:0,e:"Sisa makanan dipisahkan ke wadah organik sebelum proses pengomposan."},
+ {q:"Kertas bersih yang sudah tidak digunakan dapat ...",a:["Didaur ulang","Dibuang ke laut","Dicampur baterai","Dibakar selalu"],c:0,e:"Kertas bersih dapat dikumpulkan untuk didaur ulang."},
+ {q:"Apa manfaat memilah sampah sejak dari rumah?",a:["Memperberat proses pengolahan","Memudahkan daur ulang dan pengolahan yang tepat","Membuat semua sampah berbahaya","Menambah pencemaran"],c:1,e:"Pemilahan menjaga material tetap sesuai untuk didaur ulang atau diolah."},
+ {q:"Minyak jelantah sebaiknya tidak dibuang ke saluran air karena ...",a:["Bisa mencemari air dan menyumbat saluran","Membuat air lebih bersih","Menjadi oksigen","Menghilangkan semua bakteri"],c:0,e:"Minyak jelantah dapat mencemari air dan mengganggu sistem saluran."},
+ {q:"Contoh limbah elektronik adalah ...",a:["Daun mangga","Kabel dan perangkat elektronik rusak","Kulit jeruk","Sisa roti"],c:1,e:"Perangkat elektronik rusak perlu dipilah sebagai limbah elektronik."},
+ {q:"Cara yang lebih ramah lingkungan untuk membawa belanjaan adalah ...",a:["Memakai tas pakai ulang","Meminta banyak kantong plastik","Menggunakan plastik baru setiap barang","Membuang tas setelah sekali pakai"],c:0,e:"Tas pakai ulang mengurangi kebutuhan kantong sekali pakai."},
+ {q:"Sebelum mendaur ulang wadah bekas, sebaiknya ...",a:["Dibiarkan penuh sisa makanan","Dikosongkan dan dibersihkan jika diperlukan","Dicampur dengan baterai","Dibuang ke selokan"],c:1,e:"Wadah yang bersih dan terpilah lebih mudah diproses."},
+ {q:"Sampah masker medis bekas sebaiknya ...",a:["Dilempar ke jalan","Dikelola sesuai panduan sampah rumah tangga setempat","Didaur ulang bersama botol minuman tanpa pemilahan","Dibuang ke sungai"],c:1,e:"Masker bekas perlu dibuang dengan aman sesuai panduan kesehatan dan aturan setempat."},
+ {q:"Kegiatan mengubah sampah menjadi barang baru yang berguna disebut ...",a:["Daur ulang","Pemborosan","Pencemaran","Penimbunan"],c:0,e:"Daur ulang mengolah material bekas menjadi bahan atau produk baru."},
+ {q:"Salah satu cara mengurangi sampah plastik di sekolah adalah ...",a:["Membawa botol minum isi ulang","Membeli minuman botol sekali pakai setiap jam","Membuang plastik ke taman","Membakar plastik"],c:0,e:"Botol isi ulang membantu mengurangi sampah plastik sekali pakai."},
+ {q:"Kompos yang matang umumnya dapat dimanfaatkan untuk ...",a:["Menyuburkan tanah","Membersihkan layar komputer","Menggantikan bahan bakar kendaraan","Membuat baterai"],c:0,e:"Kompos menambah bahan organik dan membantu memperbaiki kualitas tanah."}
+];
+const $ = id => document.getElementById(id);
+const startScreen=$('startScreen'), gameScreen=$('gameScreen'), video=$('video'), canvas=$('overlay'), ctx=canvas.getContext('2d');
+let hands=null, cameraStream=null, cameraRunning=false, detecting=false, selected=null, answered=false;
+let questions=[], index=0, score=0, lives=3, correctCount=0, wrongCount=0, playerName='Petualang';
+let lastGesture='', gestureSince=0, lastActionAt=0, lastFrameAt=0, cameraLoopToken=0, handPresent=false;
+const COOLDOWN=1050;
+function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
+function setCameraStatus(text,type='wait'){$('cameraStatusText').textContent=text;$('cameraDot').className='dot '+(type==='ok'?'ok':type==='bad'?'bad':'');}
+function renderQuestion(){
+ if(index>=questions.length||lives<=0){finishGame();return;}
+ const item=questions[index];answered=false;selected=null;
+ $('round').textContent=(index+1)+'/'+questions.length;$('progressBar').style.width=(index/questions.length*100)+'%';
+ $('questionText').textContent=(index+1)+'. '+item.q;$('choices').innerHTML='';
+ item.a.forEach((answer,i)=>{const b=document.createElement('button');b.className='choice';b.innerHTML='<b>'+String.fromCharCode(65+i)+'.</b> '+answer;b.addEventListener('click',()=>selectAnswer(i));$('choices').appendChild(b);});
+ $('feedback').textContent='Pilih jawaban menggunakan gestur atau tombol.';$('explanation').textContent='☝️ A • ✌️ B • 🤟 C • 🖐️ D • ✊ konfirmasi • 👌 lanjut soal';
+ $('confirmBtn').disabled=false;$('nextBtn').disabled=true;$('checkpoint').textContent='Gerbang '+(index+1);
+ $('sceneLabel').textContent=['HUTAN ALGORITMA','JEMBATAN POLA','GUA ABSTRAKSI','KOTA DATA','ISTANA LOGIKA'][index%5];
+ $('playerAvatar').style.left=Math.min(10+index*7.4,78)+'%';
+ $('score').textContent=score;$('lives').textContent='❤️'.repeat(lives)+'🖤'.repeat(3-lives);
+}
+function selectAnswer(i){
+ if(answered)return;selected=i;playSound('select');
+ [...$('choices').children].forEach((b,n)=>{b.classList.toggle('selected',n===i);});
+ $('feedback').textContent='Pilihan '+String.fromCharCode(65+i)+' dipilih. Kepalkan tangan atau tekan KONFIRMASI.';
+}
+function confirmAnswer(){
+ if(answered)return;
+ if(selected===null){$('feedback').textContent='Pilih jawaban terlebih dahulu dengan gestur atau tombol.';return;}
+ answered=true;const item=questions[index], correct=selected===item.c;
+ [...$('choices').children].forEach((b,n)=>{b.disabled=true;if(n===item.c)b.classList.add('correct');if(n===selected&&!correct)b.classList.add('wrong');});
+ if(correct){playSound('correct');score+=10;correctCount++;$('feedback').textContent='✅ Benar! +10 poin. Kamu melewati rintangan!';$('playerAvatar').textContent='🦸';}
+ else{playSound('wrong');wrongCount++;lives--; $('feedback').textContent='❌ Belum tepat. Nyawa berkurang satu.';$('playerAvatar').textContent='🧑‍🚀';}
+ $('explanation').textContent=item.e;$('score').textContent=score;$('lives').textContent='❤️'.repeat(lives)+'🖤'.repeat(3-lives);
+ $('progressBar').style.width=((index+1)/questions.length*100)+'%';$('confirmBtn').disabled=true;$('nextBtn').disabled=false;
+}
+function nextQuestion(){if(!answered)return;playSound('next');index++;renderQuestion();}
+function startGame(){
+ audioReady();playSound('start');startBackgroundMusic();
+ playerName=$('playerName').value.trim()||'Petualang';
+ const pack=$('questionPack').value;
+ const mode=$('gameMode').value;
+ const packQuestions={informatics:QUESTIONS,general:GENERAL_QUESTIONS,waste:WASTE_QUESTIONS,mixed:[...QUESTIONS,...GENERAL_QUESTIONS,...WASTE_QUESTIONS]};
+ questions=shuffle((packQuestions[pack]||packQuestions.mixed).slice());
+ if(mode==='quick') questions=questions.slice(0,10);
+ index=0;score=0;lives=mode==='marathon'?5:3;correctCount=0;wrongCount=0;
+ startScreen.classList.add('hidden');gameScreen.classList.remove('hidden');$('endModal').classList.add('hidden');renderQuestion();
+}
+function finishGame(){
+ stopBackgroundMusic();playSound('finish');stopCamera();$('endTitle').textContent=lives<=0?'Petualangan Berakhir':'Petualangan Selesai!';
+ $('endSummary').textContent=playerName+', skor kamu '+score+' dari '+(questions.length*10)+'. Jawaban benar: '+correctCount+', salah: '+wrongCount+'. '+(score>=questions.length*8?'Hebat! Kamu penjelajah digital yang tangguh.':score>=questions.length*5?'Bagus! Terus latih kemampuan berpikir komputasionalmu.':'Tetap semangat! Coba lagi untuk menguasai materi Informatika.');
+ $('endModal').classList.remove('hidden');
+}
+function stopCamera(){
+ cameraLoopToken++;cameraRunning=false;detecting=false;
+ if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;}
+ video.srcObject=null;$('cameraPlaceholder').classList.remove('hidden');setCameraStatus('Kamera dimatikan');$('gestureText').textContent='Belum terdeteksi';
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+}
+async function startCamera(){
+ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){setCameraStatus('Browser tidak mendukung kamera','bad');$('cameraPlaceholder').innerHTML='<b>Kamera tidak tersedia</b>Gunakan browser modern melalui HTTPS atau localhost.';return;}
+ $('cameraBtn').disabled=true;setCameraStatus('Meminta izin kamera…');
+ try{
+  cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:640},height:{ideal:480}},audio:false});
+  video.srcObject=cameraStream;await video.play();$('cameraPlaceholder').classList.add('hidden');
+  canvas.width=video.videoWidth||640;canvas.height=video.videoHeight||480;
+  if(!window.Hands){throw new Error('Library MediaPipe tidak berhasil dimuat. Periksa koneksi internet lalu muat ulang halaman.');}
+  if(!hands){
+   hands=new Hands({locateFile:(file)=>'https://cdn.jsdelivr.net/npm/@mediapipe/hands/'+file});
+   hands.setOptions({maxNumHands:1,modelComplexity:1,minDetectionConfidence:0.6,minTrackingConfidence:0.55});
+   hands.onResults(onResults);
+  }
+  cameraRunning=true;setCameraStatus('Kamera aktif — arahkan tangan ke kamera','ok');$('gestureText').textContent='Menunggu tangan…';
+  const token=++cameraLoopToken;cameraBtnLoop(token);
+ }catch(err){
+  console.error(err);setCameraStatus(err.name==='NotAllowedError'?'Izin kamera ditolak':'Kamera gagal aktif','bad');
+  $('cameraPlaceholder').classList.remove('hidden');$('cameraPlaceholder').innerHTML='<b>⚠️ Kamera belum aktif</b>'+escapeHtml(err.message||'Periksa izin kamera dan gunakan HTTPS atau localhost.');
+  if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;}
+ }finally{$('cameraBtn').disabled=false;}
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+async function cameraBtnLoop(token){
+ if(!cameraRunning||token!==cameraLoopToken)return;
+ if(video.readyState>=2&&!detecting){
+  detecting=true;try{await hands.send({image:video});}catch(e){console.warn('Deteksi tangan:',e);}finally{detecting=false;}
+ }
+ if(cameraRunning&&token===cameraLoopToken)requestAnimationFrame(()=>cameraBtnLoop(token));
+}
+function fingerUp(lm,tip,pip){return lm[tip].y<lm[pip].y-0.015;}
+function classifyGesture(lm){
+ // Landmark indices: thumb tip 4, index 8, middle 12, ring 16, pinky 20; PIP 6/10/14/18.
+ const indexUp=fingerUp(lm,8,6), middleUp=fingerUp(lm,12,10), ringUp=fingerUp(lm,16,14), pinkyUp=fingerUp(lm,20,18);
+ // Thumb extension uses horizontal distance from its MCP (2); works best with palm facing camera.
+ const thumbUp=Math.abs(lm[4].x-lm[2].x)>0.08;
+ const count=[indexUp,middleUp,ringUp,pinkyUp].filter(Boolean).length;
+ // Gestur OK: ujung ibu jari dan telunjuk saling berdekatan,
+ // sementara jari tengah, manis, dan kelingking relatif terangkat.
+ const tipDistance=Math.hypot(lm[4].x-lm[8].x,lm[4].y-lm[8].y);
+ if(tipDistance<0.065&&middleUp&&ringUp&&pinkyUp)return {name:'OK 👌 — LANJUT',action:'next'};
+ if(count===0&&!thumbUp)return {name:'KEPALAN',action:'confirm'};
+ if(count===1&&indexUp&&!middleUp)return {name:'TELUNJUK',action:'select',value:0};
+ if(count===2&&indexUp&&middleUp&&!ringUp)return {name:'DUA JARI',action:'select',value:1};
+ // Pilihan C juga menerima gestur 🤟: telunjuk dan kelingking terangkat,
+ // sedangkan ibu jari terbuka; jari tengah dan manis terlipat.
+ // Ini cocok dengan gestur yang tampak pada tangkapan layar pengguna.
+ if(indexUp&&pinkyUp&&!middleUp&&!ringUp&&thumbUp)return {name:'GESTUR C 🤟',action:'select',value:2};
+ // Pilihan C alternatif: tiga dari empat jari utama terangkat.
+ if(count===3)return {name:'TIGA JARI',action:'select',value:2};
+ if(count===4)return {name:'TELAPAK TERBUKA',action:'select',value:3};
+ if(count>=3&&thumbUp)return {name:'TANGAN TERBUKA',action:'select',value:3};
+ return {name:'TANGAN BERGERAK',action:'none'};
+}
+function onResults(results){
+ ctx.save();ctx.clearRect(0,0,canvas.width,canvas.height);
+ if(results.image)ctx.drawImage(results.image,0,0,canvas.width,canvas.height);
+ const lms=results.multiHandLandmarks&&results.multiHandLandmarks[0];
+ if(lms){
+  handPresent=true;
+  if(window.drawConnectors&&window.HAND_CONNECTIONS){drawConnectors(ctx,lms,HAND_CONNECTIONS,{color:'#22d3ee',lineWidth:4});drawLandmarks(ctx,lms,{color:'#facc15',lineWidth:2,radius:4});}
+  const g=classifyGesture(lms);$('gestureText').textContent=g.name;
+  if(g.action==='none'){lastGesture='';gestureSince=0;}
+  else{
+   const now=performance.now();
+   if(g.name!==lastGesture){lastGesture=g.name;gestureSince=now;}
+   else if(now-gestureSince>650&&now-lastActionAt>COOLDOWN){
+    if(g.action==='select'&&!answered){selectAnswer(g.value);lastActionAt=now;}
+    else if(g.action==='confirm'&&!answered&&selected!==null){confirmAnswer();lastActionAt=now;}
+    else if(g.action==='confirm'&&answered){nextQuestion();lastActionAt=now;}
+    else if(g.action==='next'&&answered){nextQuestion();lastActionAt=now;}
+   }
+  }
+ }else{
+  handPresent=false;$('gestureText').textContent='Tangan tidak terdeteksi';lastGesture='';gestureSince=0;
+ }
+ ctx.restore();
+}
+
+// Audio ceria dibuat dengan Web Audio API: tidak perlu mengunduh file suara.
+let soundEnabled = true;
+let audioCtx = null;
+function audioReady(){
+  if(!audioCtx){
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(AC) audioCtx = new AC();
+  }
+  if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+}
+function playTone(freq, duration=0.12, type='sine', volume=0.055, delay=0){
+  if(!soundEnabled) return;
+  audioReady();
+  if(!audioCtx) return;
+  const osc=audioCtx.createOscillator(), gain=audioCtx.createGain();
+  osc.type=type; osc.frequency.setValueAtTime(freq,audioCtx.currentTime+delay);
+  gain.gain.setValueAtTime(0.0001,audioCtx.currentTime+delay);
+  gain.gain.exponentialRampToValueAtTime(volume,audioCtx.currentTime+delay+0.015);
+  gain.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+delay+duration);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(audioCtx.currentTime+delay); osc.stop(audioCtx.currentTime+delay+duration+0.03);
+}
+function playSound(kind){
+  if(!soundEnabled) return;
+  const tunes={
+    start:[[523,.11],[659,.11],[784,.16],[1047,.2]],
+    select:[[660,.08],[880,.1]],
+    correct:[[659,.11],[784,.11],[988,.13],[1175,.22]],
+    wrong:[[330,.15],[262,.22]],
+    next:[[784,.08],[988,.1],[1175,.15]],
+    finish:[[523,.12],[659,.12],[784,.12],[1047,.18],[784,.12],[1047,.28]],
+    click:[[600,.06]]
+  };
+  (tunes[kind]||tunes.click).forEach((n,i)=>playTone(n[0],n[1],'sine',kind==='wrong'?.045:.05,i*0.105));
+}
+function updateSoundButtons(){
+  const label=soundEnabled?'🎵 MUSIK: ON':'🔇 MUSIK: OFF';
+  ['soundToggleStart','soundToggleGame'].forEach(id=>{const el=$(id);if(el)el.textContent=label;});
+}
+let musicTimer = null;
+let musicStep = 0;
+const happyMelody = [
+  [523,0.18],[659,0.18],[784,0.18],[659,0.18],
+  [698,0.18],[784,0.18],[880,0.28],[784,0.18],
+  [659,0.18],[523,0.18],[587,0.18],[659,0.3],
+  [523,0.18],[587,0.18],[659,0.18],[784,0.3]
+];
+function musicTick(){
+  if(!soundEnabled || !audioCtx) return;
+  const note=happyMelody[musicStep%happyMelody.length];
+  playTone(note[0],note[1],'triangle',0.025,0);
+  if(musicStep%4===0) playTone(note[0]/2,note[1]*0.9,'sine',0.012,0);
+  musicStep++;
+}
+function startBackgroundMusic(){
+  if(!soundEnabled) return;
+  audioReady();
+  stopBackgroundMusic();
+  musicStep=0;
+  musicTick();
+  musicTimer=setInterval(musicTick,220);
+}
+function stopBackgroundMusic(){
+  if(musicTimer!==null){clearInterval(musicTimer);musicTimer=null;}
+}
+function toggleSound(){
+  soundEnabled=!soundEnabled;
+  if(soundEnabled){audioReady();playSound('select');if(!gameScreen.classList.contains('hidden'))startBackgroundMusic();}
+  else stopBackgroundMusic();
+  updateSoundButtons();
+}
+
+$('soundToggleStart').addEventListener('click',toggleSound);
+$('soundToggleGame').addEventListener('click',toggleSound);
+updateSoundButtons();
+$('startBtn').addEventListener('click',startGame);
+$('helpBtn').addEventListener('click',()=>$('helpModal').classList.remove('hidden'));
+$('closeHelpBtn').addEventListener('click',()=>$('helpModal').classList.add('hidden'));
+$('cameraBtn').addEventListener('click',startCamera);
+$('stopCameraBtn').addEventListener('click',stopCamera);
+$('confirmBtn').addEventListener('click',confirmAnswer);
+$('nextBtn').addEventListener('click',nextQuestion);
+$('restartBtn').addEventListener('click',()=>{stopCamera();startGame();});
+$('exitBtn').addEventListener('click',finishGame);
+$('playAgainBtn').addEventListener('click',()=>{ $('endModal').classList.add('hidden');startGame();});
+$('backMenuBtn').addEventListener('click',()=>{$('endModal').classList.add('hidden');gameScreen.classList.add('hidden');startScreen.classList.remove('hidden');});
+window.addEventListener('resize',()=>{if(video.videoWidth){canvas.width=video.videoWidth;canvas.height=video.videoHeight;}});
+})();
+</script>
+</body>
+</html>
